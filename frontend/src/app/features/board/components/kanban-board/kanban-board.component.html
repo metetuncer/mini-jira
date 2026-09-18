@@ -1,0 +1,55 @@
+<div class="board" cdkDropListGroup>
+  @for (s of vm.statuses; track $index; let idx = $index) {
+    <section class="column">
+      <div class="column-heading">
+        <span class="dot" [class]="'dot status-' + idx"></span>
+        <h2>{{ s }}</h2>
+        <span class="count">{{ vm.column(idx).length }}</span>
+      </div>
+      <div
+        class="drop-zone"
+        cdkDropList
+        [cdkDropListData]="vm.column(idx)"
+        [cdkDropListDisabled]="vm.busy()"
+        (cdkDropListDropped)="vm.drop($event, idx)"
+      >
+        @for (t of vm.column(idx); track t.id) {
+          <article class="task-card" cdkDrag cdkDragPreviewContainer="parent" [cdkDragData]="t">
+            <div class="card-top">
+              <span class="type-icon" [class.bug]="t.issueType === 1">{{
+                t.issueType === 1 ? '●' : '✓'
+              }}</span
+              ><span>{{ vm.types[t.issueType === 1 ? 1 : 0] }}</span
+              ><button class="drag-handle" cdkDragHandle aria-label="Görevi sürükle">⠿</button>
+            </div>
+            <button class="task-title" (click)="vm.openTask(t)">{{ t.title }}</button>
+            <div class="card-labels">
+              @for (id of t.labelIds; track id) {
+                @if (vm.labelFor(id); as l) {
+                  <span class="label-chip" [style.borderColor]="l.colorHex">{{ l.name }}</span>
+                }
+              }
+            </div>
+            @if (t.dueDate) {
+              <div class="due" [class.danger]="vm.overdue(t)">
+                ◷ {{ t.dueDate | date: 'dd.MM.yyyy' }}{{ vm.overdue(t) ? ' · Gecikti' : '' }}
+              </div>
+            }
+            <div class="card-footer">
+              <span class="issue-key">{{ vm.key(t) }}</span
+              ><span [class]="'priority priority-' + t.priority" [title]="vm.priorities[t.priority]">{{
+                t.priority === 2 ? '↑↑' : t.priority === 1 ? '=' : '↓'
+              }}</span>
+
+              <span class="avatar small" [title]="vm.person(t.assigneeId)">{{
+                vm.initials(t.assigneeId)
+              }}</span>
+            </div>
+          </article>
+        } @empty {
+          <div class="empty-column">Bu aşamada görev yok<span>Bir görevi buraya taşıyabilirsin.</span></div>
+        }
+      </div>
+    </section>
+  }
+</div>

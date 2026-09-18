@@ -1,0 +1,43 @@
+<section class="panel form-panel">
+  <div class="section-heading">
+    <h2>{{ vm.editingSprint ? 'Sprinti düzenle' : 'Sprint planla' }}</h2>
+    <button class="btn quiet" (click)="vm.showSprint = false">Kapat</button>
+  </div>
+  <form (ngSubmit)="vm.saveSprint()" #sprintForm="ngForm">
+    <div class="form-grid">
+      <label class="wide"
+        >Sprint adı<input
+          name="name"
+          required
+          maxlength="100"
+          [(ngModel)]="vm.sprintDraft.name"
+          placeholder="Örn. Sprint 1 — Temel deneyim" /></label
+      ><label class="wide"
+        >Sprint hedefi<textarea
+          name="goal"
+          maxlength="2000"
+          [(ngModel)]="vm.sprintDraft.goal"
+          rows="2"
+        ></textarea></label
+      ><label
+        >Başlangıç<input type="date" required name="start" [(ngModel)]="vm.sprintDraft.startDate" /></label
+      ><label
+        >Bitiş<input
+          type="date"
+          required
+          name="end"
+          [min]="vm.sprintDraft.startDate"
+          [(ngModel)]="vm.sprintDraft.endDate"
+      /></label>
+    </div>
+    <div class="form-footer">
+      <span>Bir projede aynı anda bir aktif sprint bulunabilir.</span
+      ><button
+        class="btn primary"
+        [disabled]="vm.busy() || sprintForm.invalid || vm.sprintDraft.endDate < vm.sprintDraft.startDate"
+      >
+        Kaydet
+      </button>
+    </div>
+  </form>
+</section>

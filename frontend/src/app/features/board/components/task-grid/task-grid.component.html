@@ -1,0 +1,163 @@
+<div class="grid-actions">
+  <span class="muted">Hücrelerden durum, kişi ve sprinti düzenle.</span
+  ><button class="btn" (click)="vm.exportCsv()" [disabled]="!vm.filtered().length">↓ CSV dışa aktar</button>
+</div>
+@if (vm.selectedIds().length) {
+  <div class="bulk-bar">
+    <strong>{{ vm.selectedIds().length }} görev seçildi</strong
+    ><select
+      aria-label="Toplu işlem alanı"
+      [(ngModel)]="vm.bulkField"
+      (ngModelChange)="vm.bulkValue = $event === 'status' ? 0 : null"
+    >
+      <option value="assigneeId">Kişiye ata</option>
+      <option value="sprintId">Sprinte taşı</option>
+      <option value="status">Durumu değiştir</option></select
+    ><select aria-label="Toplu işlem değeri" [(ngModel)]="vm.bulkValue">
+      @if (vm.bulkField === 'assigneeId') {
+        <option [ngValue]="null">Atamayı kaldır</option>
+        @for (m of vm.members(); track m.id) {
+          <option [ngValue]="m.userId">{{ m.displayName }}</option>
+        }
+      } @else if (vm.bulkField === 'sprintId') {
+        <option [ngValue]="null">Backlog</option>
+        @for (s of vm.availableSprints(); track s.id) {
+          <option [ngValue]="s.id">{{ s.name }}</option>
+        }
+      } @else {
+        @for (s of vm.statuses; track $index) {
+          <option [ngValue]="$index">{{ s }}</option>
+        }
+      }</select
+    ><button class="btn primary" [disabled]="vm.busy()" (click)="vm.bulkApply()">Uygula</button
+    ><button class="btn quiet" (click)="vm.selected.set(vm.emptySelection())">Seçimi temizle</button>
+  </div>
+}
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>
+          <input
+            type="checkbox"
+            aria-label="Sayfadaki tüm görevleri seç"
+            [checked]="vm.allPageSelected()"
+            (change)="vm.togglePage()"
+          />
+        </th>
+        @for (
+          h of [
+            ['title', 'Görev'],
+            ['issueType', 'Tür'],
+            ['status', 'Durum'],
+            ['priority', 'Öncelik'],
+            ['assigneeId', 'Atanan kişi'],
+            ['sprintId', 'Sprint'],
+            ['dueDate', 'Son tarih']
+          ];
+          track h[0]
+        ) {
+          <th
+            [attr.aria-sort]="vm.sortKey() === h[0] ? (vm.descending() ? 'descending' : 'ascending') : 'none'"
+          >
+            <button (click)="vm.sort(h[0])">{{ h[1] }}{{ vm.sortMark(h[0]) }}</button>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (t of vm.rows(); track t.id) {
+        <tr [class.selected]="vm.selected().has(t.id)">
+          <td>
+            <input
+              type="checkbox"
+              [attr.aria-label]="vm.key(t) + ' seç'"
+              [checked]="vm.selected().has(t.id)"
+              (change)="vm.toggle(t.id)"
+            />
+          </td>
+          <td class="title-cell">
+            <button (click)="vm.openTask(t)">
+              <span class="issue-key">{{ vm.key(t) }}</span
+              ><strong>{{ t.title }}</strong>
+            </button>
+          </td>
+          <td>
+            <span class="badge">{{ vm.types[t.issueType === 1 ? 1 : 0] }}</span>
+          </td>
+          <td>
+            <select
+              #rowStatus="ngModel"
+              [attr.aria-label]="vm.key(t) + ' durum'"
+              [ngModel]="t.status"
+              (ngModelChange)="vm.updateField(t, 'status', $event, rowStatus)"
+              [disabled]="vm.busy()"
+            >
+              @for (s of vm.statuses; track $index) {
+                <option [ngValue]="$index">{{ s }}</option>
+              }
+            </select>
+          </td>
+          <td>
+            <span [class]="'priority priority-' + t.priority">{{ vm.priorities[t.priority] }}</span>
+          </td>
+          <td>
+            <select
+              #rowAssignee="ngModel"
+              [attr.aria-label]="vm.key(t) + ' atanan kişi'"
+              [ngModel]="t.assigneeId || null"
+              (ngModelChange)="vm.updateField(t, 'assigneeId', $event, rowAssignee)"
+              [disabled]="vm.busy()"
+            >
+              <option [ngValue]="null">Atanmamış</option>
+              @for (m of vm.members(); track m.id) {
+                <option [ngValue]="m.userId">{{ m.displayName }}</option>
+              }
+            </select>
+          </td>
+          <td>
+            <select
+              #rowSprint="ngModel"
+              [attr.aria-label]="vm.key(t) + ' sprint'"
+              [ngModel]="t.sprintId || null"
+              (ngModelChange)="vm.updateField(t, 'sprintId', $event, rowSprint)"
+              [disabled]="vm.busy()"
+            >
+              <option [ngValue]="null">Backlog</option>
+              @for (s of vm.sprints(); track s.id) {
+                <option [ngValue]="s.id" [disabled]="s.status === 2">{{ s.name }}</option>
+              }
+            </select>
+          </td>
+
+          <td class="nowrap" [class.danger]="vm.overdue(t)">
+            {{ t.dueDate ? (t.dueDate | date: 'dd.MM.yyyy') : '—' }}
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="8" class="empty">Filtrelere uyan görev bulunamadı.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+<div class="pagination">
+  <label
+    >Sayfa başına
+    <select [ngModel]="vm.pageSize()" (ngModelChange)="vm.pageSize.set($event); vm.page.set(0)">
+      @for (n of [10, 25, 50]; track n) {
+        <option [ngValue]="n">{{ n }}</option>
+      }
+    </select></label
+  ><span>{{ vm.currentPage() + 1 }} / {{ vm.pageCount() }} · {{ vm.filtered().length }} görev</span
+  ><button class="btn" [disabled]="vm.currentPage() === 0" (click)="vm.page.set(vm.currentPage() - 1)">
+    ← Önceki</button
+  ><button
+    class="btn"
+    [disabled]="vm.currentPage() + 1 >= vm.pageCount()"
+    (click)="vm.page.set(vm.currentPage() + 1)"
+  >
+    Sonraki →
+  </button>
+</div>

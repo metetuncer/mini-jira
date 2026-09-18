@@ -1,0 +1,13 @@
+@use './styles/layout-controls';
+@use './styles/kanban';
+@use './styles/summary';
+@use './styles/planning-grid-team';
+@use './styles/responsive';
+
+app-board {
+  @include layout-controls.rules;
+  @include kanban.rules;
+  @include summary.rules;
+  @include planning-grid-team.rules;
+  @include responsive.rules;
+}

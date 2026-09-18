@@ -1,0 +1,85 @@
+<section class="filters" aria-label="Görev filtreleri">
+  <label class="search-box"
+    ><span>⌕</span
+    ><input
+      aria-label="Görev ara"
+      [ngModel]="vm.search()"
+      (ngModelChange)="vm.search.set($event); vm.page.set(0)"
+      placeholder="Başlık, açıklama veya kimlik ara…" /></label
+  ><select
+    aria-label="Atanan kişi filtresi"
+    [ngModel]="vm.assignee()"
+    (ngModelChange)="vm.assignee.set($event); vm.page.set(0)"
+  >
+    <option value="all">Tüm kişiler</option>
+    <option value="none">Atanmamış</option>
+    @for (m of vm.members(); track m.id) {
+      <option [value]="m.userId">{{ m.displayName }}</option>
+    }</select
+  ><button
+    class="btn"
+    [class.chosen]="vm.assignee() === vm.auth.currentUser()?.id"
+    (click)="vm.assignee.set(vm.auth.currentUser()?.id || 'all'); vm.page.set(0)"
+  >
+    Bana atanan</button
+  ><select
+    aria-label="Öncelik filtresi"
+    [ngModel]="vm.priority()"
+    (ngModelChange)="vm.priority.set($event); vm.page.set(0)"
+  >
+    <option [ngValue]="-1">Tüm öncelikler</option>
+    @for (p of vm.priorities; track $index) {
+      <option [ngValue]="$index">{{ p }}</option>
+    }</select
+  ><select
+    aria-label="Tür filtresi"
+    [ngModel]="vm.type()"
+    (ngModelChange)="vm.type.set($event); vm.page.set(0)"
+  >
+    <option [ngValue]="-1">Tüm türler</option>
+    @for (t of vm.types; track $index) {
+      <option [ngValue]="$index">{{ t }}</option>
+    }</select
+  ><select
+    aria-label="Durum filtresi"
+    [ngModel]="vm.status()"
+    (ngModelChange)="vm.status.set($event); vm.page.set(0)"
+  >
+    <option [ngValue]="-1">Tüm durumlar</option>
+    @for (s of vm.statuses; track $index) {
+      <option [ngValue]="$index">{{ s }}</option>
+    }</select
+  ><select
+    aria-label="Etiket filtresi"
+    [ngModel]="vm.label()"
+    (ngModelChange)="vm.label.set($event); vm.page.set(0)"
+  >
+    <option value="all">Tüm etiketler</option>
+    @for (l of vm.labels(); track l.id) {
+      <option [value]="l.id">{{ l.name }}</option>
+    }</select
+  ><select
+    aria-label="Sprint filtresi"
+    [ngModel]="vm.scope()"
+    (ngModelChange)="vm.scope.set($event); vm.page.set(0)"
+  >
+    <option value="all">Tüm sprintler</option>
+    <option value="backlog">Backlog</option>
+    @for (s of vm.sprints(); track s.id) {
+      <option [value]="s.id">{{ s.name }}{{ s.status === 2 ? ' · Tamamlandı' : '' }}</option>
+    }</select
+  ><button class="btn quiet" (click)="vm.clearFilters()">Temizle</button>
+</section>
+<div class="results-line">
+  <span
+    >{{ vm.filtered().length }} görev
+    @if (vm.view() === 'board') {
+      · Tamamlanan sprintler panoda gösterilmez
+    }
+  </span>
+  <div class="avatars">
+    @for (m of vm.members().slice(0, 5); track m.id) {
+      <span class="avatar small" [title]="m.displayName">{{ vm.initials(m.userId) }}</span>
+    }
+  </div>
+</div>

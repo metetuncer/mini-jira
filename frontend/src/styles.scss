@@ -1,0 +1,55 @@
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  font-family: Inter, 'Segoe UI', Arial, sans-serif;
+  background: #fbfcfe;
+  color: #293650;
+}
+* {
+  box-sizing: border-box;
+}
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+button {
+  font-family: inherit;
+}
+::selection {
+  background: #e1d9ff;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid #8b7bd9;
+  outline-offset: 3px;
+}
+.mat-mdc-dialog-container {
+  --mat-dialog-container-shape: 14px;
+}
+.auth-card {
+  border: 1px solid #e3e6ef !important;
+  box-shadow: 0 12px 40px #3b315011 !important;
+  border-radius: 14px !important;
+}
+.mat-mdc-form-field {
+  font-size: 14px;
+}
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-block;
+  white-space: nowrap;
+  word-wrap: normal;
+  direction: ltr;
+  font-feature-settings: 'liga';
+  -webkit-font-smoothing: antialiased;
+}

@@ -1,0 +1,68 @@
+<section class="panel form-panel">
+  <div class="section-heading">
+    <h2>Yeni görev</h2>
+    <button class="btn quiet" (click)="vm.showTask = false">Kapat</button>
+  </div>
+  <form (ngSubmit)="vm.createTask()" #taskForm="ngForm">
+    <div class="form-grid">
+      <label class="wide"
+        >Başlık<input
+          name="title"
+          [(ngModel)]="vm.draft.title"
+          required
+          maxlength="200"
+          placeholder="Ne yapılması gerekiyor?"
+      /></label>
+      <label class="wide"
+        >Açıklama<textarea
+          name="description"
+          [(ngModel)]="vm.draft.description"
+          rows="2"
+          placeholder="Bağlam, kabul kriterleri ve detaylar"
+        ></textarea>
+      </label>
+      <label
+        >Tür<select aria-label="Tür" name="issueType" [(ngModel)]="vm.draft.issueType">
+          @for (t of vm.types; track $index) {
+            <option [ngValue]="$index">{{ t }}</option>
+          }
+        </select></label
+      >
+      <label
+        >Öncelik<select aria-label="Öncelik" name="priority" [(ngModel)]="vm.draft.priority">
+          @for (p of vm.priorities; track $index) {
+            <option [ngValue]="$index">{{ p }}</option>
+          }
+        </select></label
+      >
+      <label
+        >Atanan kişi<select aria-label="Atanan kişi" name="assigneeId" [(ngModel)]="vm.draft.assigneeId">
+          <option [ngValue]="null">Atanmamış</option>
+          @for (m of vm.members(); track m.id) {
+            <option [ngValue]="m.userId">{{ m.displayName }}</option>
+          }
+        </select></label
+      >
+      <label
+        >Sprint<select aria-label="Sprint" name="sprintId" [(ngModel)]="vm.draft.sprintId">
+          <option [ngValue]="null">Backlog</option>
+          @for (s of vm.availableSprints(); track s.id) {
+            <option [ngValue]="s.id">{{ s.name }}</option>
+          }
+        </select></label
+      >
+
+      <label>Son tarih<input name="dueDate" type="date" [(ngModel)]="vm.draft.dueDate" /></label>
+    </div>
+    <div class="form-footer">
+      <span>Yeni görev “Yapılacak” durumunda oluşturulur.</span
+      ><button
+        class="btn primary"
+        type="submit"
+        [disabled]="vm.busy() || taskForm.invalid || !vm.draft.title.trim()"
+      >
+        Görevi oluştur
+      </button>
+    </div>
+  </form>
+</section>

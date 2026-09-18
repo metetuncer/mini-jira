@@ -1,0 +1,90 @@
+<div class="workspace">
+  <aside class="sidebar">
+    <a routerLink="/projects" class="back-link">← Tüm projeler</a>
+    <div class="project-identity">
+      <span class="project-logo">{{ vm.project()?.name?.slice(0, 1) || 'M' }}</span>
+      <div>
+        <strong>{{ vm.project()?.name || 'Proje' }}</strong
+        ><small>Yazılım projesi</small>
+      </div>
+    </div>
+    <span class="eyebrow">ÇALIŞMA ALANI</span>
+    <nav aria-label="Proje görünümleri">
+      @for (tab of vm.tabs; track tab.id) {
+        <button [class.active]="vm.view() === tab.id" (click)="vm.changeView(tab.id)">
+          <span class="nav-icon">{{ tab.icon }}</span
+          >{{ tab.name }}
+        </button>
+      }
+    </nav>
+    <div class="sidebar-bottom">
+      <span class="connection" [class.online]="vm.realtime.connected()"></span
+      >{{ vm.realtime.connected() ? 'Canlı güncellemeler açık' : 'Canlı bağlantı yok' }}
+      <p>{{ vm.members().length }} ekip üyesi · {{ vm.isAdmin() ? 'Yönetici' : 'Üye' }}</p>
+    </div>
+  </aside>
+  <main class="project-main" [attr.aria-busy]="vm.busy() || vm.loading()">
+    <header class="page-header">
+      <div>
+        <div class="breadcrumb">Projeler <span>/</span> {{ vm.project()?.name }}</div>
+        <h1>
+          {{
+            vm.view() === 'summary'
+              ? 'Genel bakış'
+              : vm.view() === 'board'
+                ? 'Kanban panosu'
+                : vm.view() === 'backlog'
+                  ? 'Backlog & sprint'
+                  : vm.view() === 'grid'
+                    ? 'Görev tablosu'
+                    : 'Ekip & etiketler'
+          }}
+        </h1>
+        <p class="subtitle">
+          {{ vm.project()?.description || 'Ekibini bir araya getir. Sıradaki işi birlikte planla.' }}
+        </p>
+      </div>
+      <div class="header-actions">
+        <button class="btn" [disabled]="vm.busy()" (click)="vm.refresh()">↻ Yenile</button
+        ><button class="btn primary" [disabled]="vm.busy()" (click)="vm.showTask = !vm.showTask">
+          + Görev oluştur
+        </button>
+      </div>
+    </header>
+    @if (vm.error()) {
+      <div class="alert error" role="alert">{{ vm.error() }}</div>
+    }
+    @if (vm.notice()) {
+      <div class="alert notice" role="status">{{ vm.notice() }}</div>
+    }
+    @if (vm.loading()) {
+      <div class="empty panel">Proje yükleniyor…</div>
+    }
+    @if (vm.showTask) {
+      <app-task-create />
+    }
+    @if (vm.showSprint) {
+      <app-sprint-form />
+    }
+    @if (!vm.loading() && vm.project()) {
+      @if (vm.view() === 'summary') {
+        <app-project-summary />
+      }
+      @if (vm.view() === 'board' || vm.view() === 'backlog' || vm.view() === 'grid') {
+        <app-task-filters />
+      }
+      @if (vm.view() === 'board') {
+        <app-kanban-board />
+      }
+      @if (vm.view() === 'backlog') {
+        <app-sprint-planning />
+      }
+      @if (vm.view() === 'grid') {
+        <app-task-grid />
+      }
+      @if (vm.view() === 'team') {
+        <app-project-team />
+      }
+    }
+  </main>
+</div>

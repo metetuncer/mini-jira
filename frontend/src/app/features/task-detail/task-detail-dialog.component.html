@@ -1,0 +1,193 @@
+<div class="dialog-header">
+  <span class="issue-key">MJ-{{ task().id.slice(0, 8).toUpperCase() }}</span>
+  <mat-form-field appearance="outline" class="title-field">
+    <input
+      matInput
+      aria-label="Görev başlığı"
+      maxlength="200"
+      [ngModel]="task().title"
+      (ngModelChange)="onTitleChange($event)"
+    />
+  </mat-form-field>
+  <button mat-icon-button (click)="close()" aria-label="Kapat">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
+<div mat-dialog-content class="dialog-content">
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+  @if (message()) {
+    <p class="success" role="status">{{ message() }}</p>
+  }
+  <div class="planning-fields">
+    <label
+      >Durum <small>Hemen kaydedilir</small
+      ><select
+        aria-label="Görev durumu"
+        [ngModel]="task().status"
+        (ngModelChange)="changeStatus($event)"
+        [disabled]="busy() || archived()"
+      >
+        @for (s of statuses; track $index) {
+          <option [ngValue]="$index">{{ s }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Tür<select
+        aria-label="Görev türü"
+        [ngModel]="task().issueType === 1 ? 1 : 0"
+        (ngModelChange)="field('issueType', $event)"
+      >
+        @for (t of types; track $index) {
+          <option [ngValue]="$index">{{ t }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Atanan kişi<select
+        aria-label="Atanan kişi"
+        [ngModel]="task().assigneeId || null"
+        (ngModelChange)="field('assigneeId', $event)"
+      >
+        <option [ngValue]="null">Atanmamış</option>
+        @for (m of data.members; track m.id) {
+          <option [ngValue]="m.userId">{{ m.displayName }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Sprint<select
+        aria-label="Görevin sprinti"
+        [ngModel]="task().sprintId || null"
+        (ngModelChange)="field('sprintId', $event)"
+        [disabled]="archived()"
+      >
+        <option [ngValue]="null">Backlog</option>
+        @for (s of data.sprints; track s.id) {
+          <option [ngValue]="s.id" [disabled]="s.status === 2">{{ s.name }}</option>
+        }
+      </select></label
+    >
+
+    <label
+      >Son tarih<input
+        aria-label="Son tarih"
+        type="date"
+        [ngModel]="task().dueDate"
+        (ngModelChange)="field('dueDate', $event || null)"
+    /></label>
+  </div>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Açıklama</mat-label>
+    <textarea
+      matInput
+      rows="3"
+      [ngModel]="task().description"
+      (ngModelChange)="onDescriptionChange($event)"
+    ></textarea>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="priority-field">
+    <mat-label>Öncelik</mat-label>
+    <mat-select [ngModel]="task().priority" (ngModelChange)="onPriorityChange($event)">
+      <mat-option [value]="Priority.Low">Düşük</mat-option>
+      <mat-option [value]="Priority.Medium">Orta</mat-option>
+      <mat-option [value]="Priority.High">Yüksek</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <button mat-stroked-button color="primary" (click)="save()" [disabled]="busy() || !task().title.trim()">
+    {{ saving() ? 'Kaydediliyor...' : 'Değişiklikleri kaydet' }}
+  </button>
+
+  <section class="section">
+    <h3>Etiketler <small>Seçimler hemen kaydedilir</small></h3>
+    <div class="label-chips">
+      @for (label of data.labels; track label.id) {
+        <button
+          type="button"
+          [disabled]="busy()"
+          class="chip"
+          [class.active]="isLabelActive(label.id)"
+          [style.borderColor]="label.colorHex"
+          [style.background]="isLabelActive(label.id) ? label.colorHex : 'transparent'"
+          [style.color]="isLabelActive(label.id) ? '#fff' : 'inherit'"
+          (click)="toggleLabel(label.id)"
+        >
+          {{ label.name }}
+        </button>
+      }
+      @if (data.labels.length === 0) {
+        <span class="hint">Bu projede henüz etiket yok.</span>
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <h3>Dosya ekleri</h3>
+    <input type="file" (change)="onFileSelected($event)" [disabled]="busy()" />
+    <ul class="attachment-list">
+      @for (attachment of attachments(); track attachment.id) {
+        <li>
+          <button mat-button (click)="download(attachment)" [disabled]="busy()">
+            {{ attachment.fileName }}
+          </button>
+          <span class="meta">{{ formatSize(attachment.fileSizeBytes) }}</span>
+          <button
+            mat-icon-button
+            [disabled]="busy()"
+            (click)="deleteAttachment(attachment.id)"
+            aria-label="Sil"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="section">
+    <h3>Yorumlar</h3>
+    <ul class="comment-list">
+      @for (comment of comments(); track comment.id) {
+        <li>
+          <div class="comment-header">
+            <strong>{{ comment.authorDisplayName }}</strong>
+            @if (comment.authorId === auth.currentUser()?.id) {
+              <button
+                mat-icon-button
+                (click)="deleteComment(comment.id)"
+                [disabled]="busy()"
+                aria-label="Yorumu sil"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            }
+          </div>
+          <p>{{ comment.content }}</p>
+          <small>{{ comment.createdAt | date: 'dd.MM.yyyy HH:mm' }}</small>
+        </li>
+      }
+    </ul>
+
+    <div class="comment-input">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Yorum yaz</mat-label>
+        <input matInput [(ngModel)]="newComment" (keyup.enter)="addComment()" />
+      </mat-form-field>
+      <button
+        mat-icon-button
+        [disabled]="busy() || !newComment.trim()"
+        (click)="addComment()"
+        aria-label="Gönder"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+  </section>
+
+  <button mat-button color="warn" [disabled]="busy()" (click)="deleteTask()">Görevi sil</button>
+</div>

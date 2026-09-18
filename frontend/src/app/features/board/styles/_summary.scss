@@ -1,0 +1,123 @@
+@mixin rules {
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin: 25px 0;
+  }
+  .stat {
+    border: 1px solid #e2e6ee;
+    background: white;
+    border-radius: 9px;
+    padding: 22px;
+  }
+  .stat span {
+    font-size: 12px;
+    color: #8390a2;
+  }
+  .stat strong {
+    display: block;
+    font-size: 34px;
+    font-weight: 650;
+    margin: 13px 0;
+  }
+  .stat small {
+    color: #9aa2b1;
+    font-size: 11px;
+  }
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .muted {
+    color: #8b95a7;
+    font-size: 12px;
+  }
+  .progress {
+    height: 10px;
+    background: #eceaf5;
+    border-radius: 20px;
+    overflow: hidden;
+    margin-top: 27px;
+  }
+  .progress i,
+  .workload-bar i {
+    height: 100%;
+    display: block;
+    background: #8c7bdf;
+    border-radius: 20px;
+  }
+  .status-summary {
+    margin-top: 24px;
+  }
+  .status-summary div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    font-size: 12px;
+  }
+  .status-summary strong {
+    margin-left: auto;
+  }
+  .badge {
+    display: inline-block;
+    background: #eff1f6;
+    color: #7d8799;
+    font-size: 10px;
+    border-radius: 5px;
+    padding: 5px 7px;
+    white-space: nowrap;
+  }
+  .badge.purple,
+  .badge.status-1 {
+    background: #eee9fc;
+    color: #8a70c6;
+  }
+  .badge.status-2 {
+    background: #e5f5ef;
+    color: #54a78d;
+  }
+  .workload {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 18px 0;
+    font-size: 12px;
+  }
+  .workload-bar {
+    height: 6px;
+    background: #f0eef8;
+    border-radius: 10px;
+    flex: 1;
+    margin-left: 10px;
+  }
+  .recent-task {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid #f0f2f7;
+    background: none;
+    padding: 16px 0;
+    text-align: left;
+    cursor: pointer;
+  }
+  .recent-task strong {
+    font-size: 12px;
+    flex: 1;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .empty {
+    padding: 50px 20px;
+    text-align: center;
+    color: #8e99ad;
+  }
+  .empty.compact {
+    padding: 25px 8px;
+    font-size: 12px;
+  }
+}

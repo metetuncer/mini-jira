@@ -1,0 +1,81 @@
+<div class="stats">
+  <div class="stat">
+    <span>Toplam görev</span><strong>{{ vm.tasks().length }}</strong
+    ><small>Projedeki tüm işler</small>
+  </div>
+  <div class="stat">
+    <span>Tamamlanan</span><strong>{{ vm.done() }}</strong
+    ><small>%{{ vm.progress() }} tamamlanma</small>
+  </div>
+  <div class="stat">
+    <span>Açık görev</span><strong>{{ vm.tasks().length - vm.done() }}</strong
+    ><small>Tamamlanmayı bekleyen işler</small>
+  </div>
+  <div class="stat">
+    <span>Geciken görev</span><strong [class.danger]="vm.overdueCount() > 0">{{ vm.overdueCount() }}</strong
+    ><small>Son tarihi geçen açık işler</small>
+  </div>
+</div>
+<div class="summary-grid">
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Proje ilerlemesi</h2>
+      <span class="badge">%{{ vm.progress() }}</span>
+    </div>
+    <div class="progress"><i [style.width.%]="vm.progress()"></i></div>
+    <p class="muted">{{ vm.done() }} / {{ vm.tasks().length }} görev tamamlandı</p>
+    <div class="status-summary">
+      @for (s of vm.statuses; track $index) {
+        <div>
+          <span class="dot" [class]="'dot status-' + $index"></span>{{ s
+          }}<strong>{{ vm.tasks().length ? ($index === 2 ? vm.done() : vm.countStatus($index)) : 0 }}</strong>
+        </div>
+      }
+    </div>
+  </section>
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Aktif sprint</h2>
+      <button class="btn quiet" (click)="vm.changeView('backlog')">Planlamaya git →</button>
+    </div>
+    @if (vm.activeSprint(); as s) {
+      <h3>{{ s.name }}</h3>
+      <p>{{ s.goal || 'Bu sprint için hedef eklenmedi.' }}</p>
+      <p class="muted">{{ s.startDate | date: 'dd.MM.yyyy' }} — {{ s.endDate | date: 'dd.MM.yyyy' }}</p>
+      <span class="badge purple">{{ vm.sprintTasks(s.id).length }} görev</span>
+    } @else {
+      <div class="empty compact">
+        Henüz aktif sprint yok.
+        <p>Backlog’dan bir sprint planlayıp ekibin odağını belirle.</p>
+      </div>
+    }
+  </section>
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Ekip iş yükü</h2>
+      <span class="muted">Açık görevler</span>
+    </div>
+    @for (m of vm.members(); track m.id) {
+      <div class="workload">
+        <span class="avatar">{{ vm.initials(m.userId) }}</span
+        ><span>{{ m.displayName }}</span>
+        <div class="workload-bar">
+          <i [style.width.%]="vm.tasks().length ? (vm.countFor(m.userId) / vm.tasks().length) * 100 : 0"></i>
+        </div>
+        <strong>{{ vm.countFor(m.userId) }}</strong>
+      </div>
+    }
+  </section>
+  <section class="panel">
+    <div class="section-heading"><h2>Son güncellenen görevler</h2></div>
+    @for (t of vm.recentTasks(); track t.id) {
+      <button class="recent-task" (click)="vm.openTask(t)">
+        <span class="issue-key">{{ vm.key(t) }}</span
+        ><strong>{{ t.title }}</strong
+        ><span class="badge" [class]="'badge status-' + t.status">{{ vm.statuses[t.status] }}</span>
+      </button>
+    } @empty {
+      <div class="empty compact">İlk görevi oluşturarak başla.</div>
+    }
+  </section>
+</div>

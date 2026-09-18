@@ -1,0 +1,79 @@
+<div class="summary-grid">
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Proje ekibi</h2>
+      <span class="badge">{{ vm.members().length }} kişi</span>
+    </div>
+    <p class="muted">Görevler yalnızca bu projenin üyelerine atanabilir.</p>
+    @if (vm.isAdmin()) {
+      <form class="inline-form" (ngSubmit)="vm.addMember()" #memberForm="ngForm">
+        <input
+          name="email"
+          type="email"
+          required
+          email
+          [(ngModel)]="vm.memberEmail"
+          placeholder="Kayıtlı kullanıcının e-postası"
+          aria-label="Üye e-postası"
+        /><select name="role" [(ngModel)]="vm.memberRole" aria-label="Yeni üye rolü">
+          <option [ngValue]="0">Üye</option>
+          <option [ngValue]="1">Yönetici</option></select
+        ><button class="btn primary" [disabled]="vm.busy() || memberForm.invalid">Ekle</button>
+      </form>
+    }
+    @for (m of vm.members(); track m.id) {
+      <div class="member-row">
+        <span class="avatar">{{ vm.initials(m.userId) }}</span>
+        <div class="member-info">
+          <strong>{{ m.displayName }}</strong
+          ><small>{{ m.email }}</small>
+        </div>
+        @if (vm.isAdmin() && m.userId !== vm.project()?.ownerId) {
+          <select
+            [attr.aria-label]="m.displayName + ' rolü'"
+            [ngModel]="m.role"
+            (ngModelChange)="vm.changeRole(m, $event)"
+            [disabled]="vm.busy()"
+          >
+            <option [ngValue]="0">Üye</option>
+            <option [ngValue]="1">Yönetici</option></select
+          ><button class="btn quiet danger" (click)="vm.removeMember(m)" [disabled]="vm.busy()">Çıkar</button>
+        } @else {
+          <span class="badge">{{
+            m.userId === vm.project()?.ownerId ? 'Proje sahibi' : m.role === 1 ? 'Yönetici' : 'Üye'
+          }}</span>
+        }
+      </div>
+    }
+  </section>
+  <section class="panel">
+    <div class="section-heading">
+      <h2>Etiketler</h2>
+      <span class="badge">{{ vm.labels().length }}</span>
+    </div>
+    <p class="muted">Görevleri bileşen, konu veya ekip bazında grupla.</p>
+    <form class="inline-form" (ngSubmit)="vm.addLabel()" #labelForm="ngForm">
+      <input
+        name="label"
+        [(ngModel)]="vm.labelName"
+        required
+        maxlength="50"
+        placeholder="Örn. Backend"
+        aria-label="Etiket adı"
+      /><input name="color" type="color" [(ngModel)]="vm.labelColor" aria-label="Etiket rengi" /><button
+        class="btn primary"
+        [disabled]="vm.busy() || labelForm.invalid || !vm.labelName.trim()"
+      >
+        Ekle
+      </button>
+    </form>
+    @for (l of vm.labels(); track l.id) {
+      <div class="member-row">
+        <span class="dot" [style.background]="l.colorHex"></span><strong class="grow">{{ l.name }}</strong
+        ><button class="btn quiet danger" [disabled]="vm.busy()" (click)="vm.removeLabel(l)">Sil</button>
+      </div>
+    } @empty {
+      <div class="empty compact">Henüz etiket oluşturulmadı.</div>
+    }
+  </section>
+</div>

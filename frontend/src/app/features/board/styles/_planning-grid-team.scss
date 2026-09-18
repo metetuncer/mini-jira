@@ -1,0 +1,174 @@
+@mixin rules {
+  .sprint-panel {
+    margin: 16px 0 24px;
+    padding-bottom: 10px;
+  }
+  .sprint-title {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .backlog-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    border-top: 1px solid #edf0f5;
+    padding: 13px 0;
+  }
+  .backlog-title {
+    display: flex;
+    flex: 1;
+    gap: 12px;
+    align-items: center;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    color: #4c5970;
+    min-width: 0;
+  }
+  .backlog-title strong {
+    font-size: 12px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+  .backlog-row select {
+    max-width: 165px;
+  }
+  .grid-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  .table-wrap {
+    overflow: auto;
+    border: 1px solid #e1e5ed;
+    border-radius: 8px;
+    background: white;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  th {
+    background: #f8f9fc;
+    color: #8891a3;
+    font-weight: 500;
+    text-align: left;
+    padding: 13px 10px;
+    white-space: nowrap;
+  }
+  th button {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+  td {
+    padding: 12px 10px;
+    border-top: 1px solid #edf0f6;
+  }
+  tr.selected {
+    background: #f4f0ff;
+  }
+  td select {
+    border-color: transparent;
+    background: transparent;
+    max-width: 150px;
+    padding: 5px;
+    font-size: 11px;
+  }
+  td select:hover {
+    border-color: #c9c1e6;
+    background: white;
+  }
+  .title-cell {
+    min-width: 210px;
+    max-width: 350px;
+  }
+  .title-cell button {
+    background: none;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    color: #48556d;
+    padding: 0;
+  }
+  .title-cell strong {
+    display: block;
+    font-size: 12px;
+    line-height: 1.6;
+    font-weight: 500;
+    margin-top: 3px;
+    overflow-wrap: anywhere;
+  }
+  .nowrap {
+    white-space: nowrap;
+  }
+  .pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    font-size: 11px;
+    color: #8590a4;
+    margin: 18px 0;
+  }
+  .pagination label {
+    margin-right: auto;
+  }
+  .bulk-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 15px;
+    background: #ede8ff;
+    border-radius: 7px;
+    margin-bottom: 12px;
+    font-size: 12px;
+  }
+  .inline-form {
+    display: flex;
+    gap: 8px;
+    padding: 10px 0 20px;
+  }
+  .inline-form input:not([type='color']) {
+    flex: 1;
+    min-width: 0;
+  }
+  .inline-form input[type='color'] {
+    width: 40px;
+    height: 36px;
+    padding: 3px;
+  }
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 15px 0;
+    border-top: 1px solid #f0f2f7;
+  }
+  .member-info,
+  .grow {
+    flex: 1;
+    min-width: 0;
+  }
+  .member-info strong {
+    font-size: 12px;
+  }
+  .member-info small {
+    display: block;
+    color: #8e98ac;
+    font-size: 10px;
+    margin-top: 5px;
+    overflow-wrap: anywhere;
+  }
+  .member-row select {
+    max-width: 110px;
+    font-size: 11px;
+  }
+}

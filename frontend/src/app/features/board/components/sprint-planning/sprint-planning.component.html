@@ -1,0 +1,94 @@
+<div class="section-heading">
+  <h2>Çalışmayı planla</h2>
+  @if (vm.isAdmin()) {
+    <button class="btn" (click)="vm.editSprint()">+ Sprint oluştur</button>
+  }
+</div>
+@for (s of vm.sprints(); track s.id) {
+  <section class="panel sprint-panel">
+    <div class="section-heading">
+      <div>
+        <div class="sprint-title">
+          <h2>{{ s.name }}</h2>
+          <span [class]="'badge ' + (s.status === 1 ? 'purple' : s.status === 2 ? 'status-2' : '')">{{
+            s.status === 0 ? 'Planlandı' : s.status === 1 ? 'Aktif' : 'Tamamlandı'
+          }}</span
+          ><span class="muted">{{ vm.sprintTasks(s.id).length }} görev</span>
+        </div>
+        <p class="muted">
+          {{ s.startDate | date: 'dd.MM.yyyy' }} — {{ s.endDate | date: 'dd.MM.yyyy' }}
+          @if (s.goal) {
+            · {{ s.goal }}
+          }
+        </p>
+      </div>
+      @if (vm.isAdmin() && s.status !== 2) {
+        <div class="header-actions">
+          <button class="btn quiet" (click)="vm.editSprint(s)" [disabled]="vm.busy()">Düzenle</button>
+          @if (s.status === 0) {
+            <button class="btn quiet danger" (click)="vm.sprintAction(s, 'delete')" [disabled]="vm.busy()">
+              Sil</button
+            ><button
+              class="btn primary"
+              (click)="vm.sprintAction(s, 'start')"
+              [disabled]="vm.busy() || !!vm.activeSprint()"
+            >
+              Başlat
+            </button>
+          } @else {
+            <button class="btn primary" (click)="vm.sprintAction(s, 'complete')" [disabled]="vm.busy()">
+              Sprinti tamamla
+            </button>
+          }
+        </div>
+      }
+    </div>
+    @for (t of vm.sprintTasks(s.id); track t.id) {
+      <ng-container
+        *ngTemplateOutlet="backlogRow; context: { $implicit: t, archived: s.status === 2 }"
+      ></ng-container>
+    } @empty {
+      <div class="empty compact">
+        Bu sprintte filtrelere uyan görev yok. Backlog’daki sprint seçimiyle görev ekleyebilirsin.
+      </div>
+    }
+  </section>
+}
+<section class="panel sprint-panel">
+  <div class="section-heading">
+    <h2>
+      Backlog <span class="count">{{ vm.sprintTasks(null).length }}</span>
+    </h2>
+    <button class="btn quiet" (click)="vm.draft.sprintId = null; vm.showTask = true">+ Görev ekle</button>
+  </div>
+  @for (t of vm.sprintTasks(null); track t.id) {
+    <ng-container *ngTemplateOutlet="backlogRow; context: { $implicit: t, archived: false }"></ng-container>
+  } @empty {
+    <div class="empty compact">Backlog’da filtrelere uyan görev yok.</div>
+  }
+</section>
+
+<ng-template #backlogRow let-t let-archived="archived"
+  ><div class="backlog-row">
+    <span class="type-icon" [class.bug]="t.issueType === 1">{{ t.issueType === 1 ? '●' : '✓' }}</span
+    ><button class="backlog-title" (click)="vm.openTask(t)">
+      <span class="issue-key">{{ vm.key(t) }}</span
+      ><strong>{{ t.title }}</strong></button
+    ><span [class]="'badge status-' + t.status">{{ vm.statuses[t.status] }}</span
+    ><span class="avatar small" [title]="vm.person(t.assigneeId)">{{ vm.initials(t.assigneeId) }}</span>
+    @if (!archived) {
+      <select
+        #rowSprint="ngModel"
+        [attr.aria-label]="vm.key(t) + ' sprint seçimi'"
+        [ngModel]="t.sprintId || null"
+        (ngModelChange)="vm.updateField(t, 'sprintId', $event, rowSprint)"
+        [disabled]="vm.busy()"
+      >
+        <option [ngValue]="null">Backlog</option>
+        @for (s of vm.availableSprints(); track s.id) {
+          <option [ngValue]="s.id">{{ s.name }}</option>
+        }
+      </select>
+    }
+  </div></ng-template
+>

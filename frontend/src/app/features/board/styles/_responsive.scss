@@ -1,0 +1,126 @@
+@mixin rules {
+  @media (min-width: 1600px) {
+    .project-main {
+      padding: 35px 55px;
+    }
+    .board {
+      gap: 25px;
+    }
+  }
+  @media (max-width: 1200px) {
+    .sidebar {
+      padding: 20px 12px;
+    }
+    .workspace {
+      grid-template-columns: 195px minmax(0, 1fr);
+    }
+    .project-main {
+      padding: 25px 20px;
+    }
+    .page-header {
+      align-items: flex-start;
+    }
+    .header-actions {
+      flex-wrap: wrap;
+    }
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+    .backlog-row {
+      flex-wrap: wrap;
+    }
+    .backlog-title {
+      min-width: 200px;
+    }
+    .stats {
+      gap: 10px;
+    }
+    .stat {
+      padding: 15px;
+    }
+    .board {
+      gap: 10px;
+    }
+    .column {
+      padding: 12px 8px;
+    }
+    .task-card {
+      padding: 12px 10px;
+    }
+  }
+  @media (max-width: 850px) {
+    .workspace {
+      display: block;
+    }
+    .sidebar {
+      border-right: 0;
+      border-bottom: 1px solid #e1e5ee;
+      gap: 12px;
+      padding: 16px;
+    }
+    .sidebar nav {
+      flex-direction: row;
+      overflow: auto;
+    }
+    .sidebar nav button {
+      white-space: nowrap;
+      font-size: 12px;
+    }
+    .sidebar .eyebrow,
+    .sidebar-bottom,
+    .project-identity,
+    .back-link {
+      display: none;
+    }
+    .project-main {
+      padding: 20px 16px;
+    }
+    .page-header {
+      flex-wrap: wrap;
+    }
+    .board {
+      display: flex;
+      overflow-x: auto;
+      padding-bottom: 15px;
+    }
+    .column {
+      flex: 0 0 290px;
+    }
+    .stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .filters select {
+      flex: 1;
+      max-width: none;
+      min-width: 125px;
+    }
+    .filters .search-box {
+      width: 100%;
+      flex-basis: 100%;
+    }
+    .bulk-bar,
+    .pagination,
+    .form-footer {
+      flex-wrap: wrap;
+    }
+    .pagination label {
+      width: 100%;
+    }
+    .sprint-title {
+      flex-wrap: wrap;
+    }
+    .sprint-panel > .section-heading {
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+    .backlog-row .badge {
+      display: none;
+    }
+    .recent-task {
+      flex-wrap: wrap;
+    }
+  }
+}

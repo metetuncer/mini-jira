@@ -1,0 +1,61 @@
+name: Verify Mini Jira
+on: [push, pull_request]
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: minijira
+          POSTGRES_PASSWORD: minijira_dev_pw
+          POSTGRES_DB: minijira
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd 'pg_isready -U minijira -d minijira'
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Configure disposable API secrets
+        shell: bash
+        run: |
+          echo "Jwt__Key=$(openssl rand -hex 32)" >> "$GITHUB_ENV"
+          echo "ConnectionStrings__Default=Host=localhost;Port=5432;Database=minijira;Username=minijira;Password=minijira_dev_pw" >> "$GITHUB_ENV"
+      - run: npm ci
+        working-directory: frontend
+      - name: Audit frontend dependencies
+        run: npm audit --audit-level=high
+        working-directory: frontend
+      - run: dotnet build backend/MiniJira.sln
+      - run: dotnet test backend/tests/MiniJira.Tests/MiniJira.Tests.csproj --no-build
+      - run: psql -h localhost -U minijira -d minijira -v ON_ERROR_STOP=1 -f backend/sql/001_fresh_database.sql
+        env:
+          PGPASSWORD: minijira_dev_pw
+      - name: API integration checks
+        shell: bash
+        run: |
+          dotnet run --no-build --project backend/src/MiniJira.Api --launch-profile http > /tmp/minijira-api.log 2>&1 &
+          api_pid=$!
+          trap 'kill "$api_pid" || true' EXIT
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://localhost:5000/api/health > /dev/null; then ready=true; break; fi
+            sleep 1
+          done
+          if [ "$ready" != true ]; then cat /tmp/minijira-api.log; exit 1; fi
+          python3 tests/api_smoke.py
+          node tests/realtime_smoke.cjs
+      - run: npm run build
+        working-directory: frontend
+      - run: npx playwright install --with-deps chromium
+        working-directory: frontend
+      - run: npm run test:e2e
+        working-directory: frontend
