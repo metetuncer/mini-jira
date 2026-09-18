@@ -20,7 +20,7 @@ Görseller test verileriyle oluşturulmuştur; test sırasında canlı bağlant�
 .NET 8 / ASP.NET Core · EF Core / PostgreSQL · Identity / JWT · Angular 21 /
 Material / CDK · Signals · SignalR · Playwright
 
-Güncelleme ve mevcut kuruluma uygulama: [Angular 21 geçiş notları](docs/dependency-update.md).
+
 
 ## Kurulum
 
